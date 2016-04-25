@@ -7,8 +7,33 @@
 #include <stdio.h>
 #include <string.h>
 #include <hiredis/hiredis.h>
-redisContext *redis_connect;
+
+void get_redis_connect(redisContext * redis_connect){
+    redis_connect = redisConnect("127.0.0.1", 6379);
+    if (redis_connect == NULL || redis_connect->err) {
+        if (redis_connect) {
+            printf("Error: %s\n", redis_connect->errstr);
+            // handle error
+        } else {
+            printf("Can't allocate redis context\n");
+        }
+    }
+}
 void thread(int num) {
+    redisContext * redis_connect;
+    get_redis_connect(redis_connect);
+    /*
+    redis_connect = redisConnect("127.0.0.1", 6379);
+    if (redis_connect == NULL || redis_connect->err) {
+        if (redis_connect) {
+            printf("Error: %s\n", redis_connect->errstr);
+            // handle error
+        } else {
+            printf("Can't allocate redis context\n");
+        }
+    }
+     */
+
     char redis_get_cmd[20];
     memset(redis_get_cmd, 0, 20);
     switch (num) {
@@ -30,18 +55,11 @@ void thread(int num) {
     }
     redisReply *redis_reply = redisCommand(redis_connect,redis_get_cmd);
     printf("redis_reply is no problem %d;The redis_get_cmd is%s; redis_reply->type is %d; redis_reply->str :%s\n",num,redis_get_cmd, redis_reply->type, redis_reply->str);
+    redisFree(redis_connect);
 }
 
 int main(void) {
-    redis_connect = redisConnect("127.0.0.1", 6379);
-    if (redis_connect == NULL || redis_connect->err) {
-        if (redis_connect) {
-            printf("Error: %s\n", redis_connect->errstr);
-            // handle error
-        } else {
-            printf("Can't allocate redis context\n");
-        }
-    }
+
 
     int ret;
     pthread_t thread_id_1, thread_id_2, thread_id_3, thread_id_4, thread_id_0;
