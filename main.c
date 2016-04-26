@@ -1,51 +1,25 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-/*
-char get_name(){
-
-}
- */
-int get_age(int type) {
-    int age;
-    if (type == 1) {
-        age = 35;
-    } else {
-        age = 100;
-    }
-    return age;
-}
-char *getStackPoint(int type) {
-    char name[1024];
-    if( type == 1 ){
-        strcpy(name,"loken");
-    }else{
-        strcpy(name,"nahai");
-    }
-    printf("name is %s; p is %p \n", &name, &name);
-    printf("name is %s; p is %p \n", name, name);
-    return &name;
+void change_number_1(int * number){
+    *number = 10;
 }
 
-int main(void) {
-    int main_age;
-    printf("main_age point is %p\n", &main_age);
-    main_age = get_age(1);
-    printf("main_age point is %p\n", &main_age);
+void change_number_2(int ** number){
+    *number = 10;
+}
 
-    printf("main_age is %d\n", main_age);
-    int main_age_2 = get_age(2);
-    printf("main_age is %d\n", main_age);
+int main() {
+    int main_number = 5;
+    change_number_1(&main_number);
+    printf("%d\n",main_number);
+
+    int main_number_2 = 45;
+    change_number_2(&main_number_2);
+    printf("%d\n",main_number_2);
 
 
 
-    char * main_name = getStackPoint(1);
-    printf("main_name is %s; p is %p \n", main_name, main_name);
-    int i;
-    for (i = 0; i < 2; i++) {
-        getStackPoint(2);
-    };
-    printf("main_name is %s; p is %p \n", main_name, main_name);
-
-    return 0;
+    return (0);
 }
