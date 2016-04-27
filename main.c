@@ -43,16 +43,18 @@ int _tree_cut_words(struct TREE_CUT_WORDS_DATA *parent_cut_words_data) {
 
     char copy_type[20];
     memset(copy_type,0,20);
-    strcpy(copy_type,"memcpy拷贝");
+    strcpy(copy_type,"struc对拷贝");
     //这样copy一个结构体里面的值太慢了
     if( strcmp(copy_type,"memcpy拷贝") ){
         printf("memcpy拷贝 starting\n");
-        memcpy(&tree_cut_words_data,parent_cut_words_data,100);
+        memcpy(&tree_cut_words_data,parent_cut_words_data,sizeof(tree_cut_words_data));
     }else if( strcmp(copy_type,"一个一个值拷贝") ){
         printf("一个一个值拷贝 starting\n");
         strcpy(tree_cut_words_data.cut_word_result, (*parent_cut_words_data).cut_word_result);
         strcpy(tree_cut_words_data.remainder_words, (*parent_cut_words_data).remainder_words);
         *(tree_cut_words_data.words_weight) = *((*parent_cut_words_data).words_weight);
+    }else if( strcmp(copy_type,"struc对拷贝") ){
+        tree_cut_words_data = *parent_cut_words_data;
     }
 
 
@@ -61,8 +63,8 @@ int _tree_cut_words(struct TREE_CUT_WORDS_DATA *parent_cut_words_data) {
            tree_cut_words_data.cut_word_result, tree_cut_words_data.remainder_words,
            *tree_cut_words_data.words_weight);
 
-    //sleep 10秒，等待父线程把数据改了，看memcpy有没影响
-    sleep(10);
+    //sleep 2秒，等待父线程把数据改了，看赋值有没影响
+    sleep(2);
     printf("tree_cut_words_data cut_word_result is %s, remainder_words is %s,words_weight is %d\n",
            tree_cut_words_data.cut_word_result, tree_cut_words_data.remainder_words,
            *tree_cut_words_data.words_weight);
@@ -83,11 +85,11 @@ int main(void) {
     pthread_create_result = pthread_create(&parent_thread_id, NULL,
                                            (void *) _tree_cut_words, &parent_tree_cut_words_data);
 
-    //父线程把数据改了,看memcpy有没影响
+    //父线程把数据改了,看子线程赋值有没影响
     init_tree_cut_words_data(&parent_tree_cut_words_data);
     strcpy(parent_tree_cut_words_data.cut_word_result, "xiaomi");
     strcpy(parent_tree_cut_words_data.remainder_words, "好用切丝器");
 
-
+    sleep(20);
     return (0);
 }
