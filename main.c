@@ -12,7 +12,7 @@
 //可处理的最大的客户端发送的搜索词长度
 #define MAX_SEARCH_WORDS_LEN 200
 
-//父线程传参給子线程的结构体
+//线程分词的结果结构体，不是最终的结果。
 struct TREE_CUT_WORDS_DATA {
     //父级的分词结果
     char *cut_word_result;
@@ -41,13 +41,28 @@ int _tree_cut_words(struct TREE_CUT_WORDS_DATA *parent_cut_words_data) {
     struct TREE_CUT_WORDS_DATA tree_cut_words_data;
     init_tree_cut_words_data(&tree_cut_words_data);
 
-      //这样copy一个结构体里面的值太慢了
-    strcpy(tree_cut_words_data.cut_word_result, (*parent_cut_words_data).cut_word_result);
-    strcpy(tree_cut_words_data.remainder_words, (*parent_cut_words_data).remainder_words);
-    *(tree_cut_words_data.words_weight) = *((*parent_cut_words_data).words_weight);
+    char copy_type[20];
+    memset(copy_type,0,20);
+    strcpy(copy_type,"memcpy拷贝");
+    //这样copy一个结构体里面的值太慢了
+    if( strcmp(copy_type,"memcpy拷贝") ){
+        printf("memcpy拷贝 starting\n");
+        memcpy(&tree_cut_words_data,parent_cut_words_data,100);
+    }else if( strcmp(copy_type,"一个一个值拷贝") ){
+        printf("一个一个值拷贝 starting\n");
+        strcpy(tree_cut_words_data.cut_word_result, (*parent_cut_words_data).cut_word_result);
+        strcpy(tree_cut_words_data.remainder_words, (*parent_cut_words_data).remainder_words);
+        *(tree_cut_words_data.words_weight) = *((*parent_cut_words_data).words_weight);
+    }
 
 
 
+    printf("tree_cut_words_data cut_word_result is %s, remainder_words is %s,words_weight is %d\n",
+           tree_cut_words_data.cut_word_result, tree_cut_words_data.remainder_words,
+           *tree_cut_words_data.words_weight);
+
+    //sleep 10秒，等待父线程把数据改了，看memcpy有没影响
+    sleep(10);
     printf("tree_cut_words_data cut_word_result is %s, remainder_words is %s,words_weight is %d\n",
            tree_cut_words_data.cut_word_result, tree_cut_words_data.remainder_words,
            *tree_cut_words_data.words_weight);
@@ -60,8 +75,19 @@ int main(void) {
     struct TREE_CUT_WORDS_DATA parent_tree_cut_words_data;
     init_tree_cut_words_data(&parent_tree_cut_words_data);
     strcpy(parent_tree_cut_words_data.cut_word_result, "iphone6s");
-    strcpy(parent_tree_cut_words_data.remainder_words, "华为A9");
+    strcpy(parent_tree_cut_words_data.remainder_words, "飞行员墨镜");
     *(parent_tree_cut_words_data.words_weight) = 10;
-    _tree_cut_words(&parent_tree_cut_words_data);
+
+    int pthread_create_result;
+    pthread_t parent_thread_id;
+    pthread_create_result = pthread_create(&parent_thread_id, NULL,
+                                           (void *) _tree_cut_words, &parent_tree_cut_words_data);
+
+    //父线程把数据改了,看memcpy有没影响
+    init_tree_cut_words_data(&parent_tree_cut_words_data);
+    strcpy(parent_tree_cut_words_data.cut_word_result, "xiaomi");
+    strcpy(parent_tree_cut_words_data.remainder_words, "好用切丝器");
+
+
     return (0);
 }
