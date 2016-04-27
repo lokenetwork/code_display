@@ -44,7 +44,7 @@ int _tree_cut_words(struct TREE_CUT_WORDS_DATA *parent_cut_words_data) {
     char copy_type[20];
     memset(copy_type,0,20);
     strcpy(copy_type,"struc对拷贝");
-    //这样copy一个结构体里面的值太慢了
+    //struc对拷贝是最优雅的写法
     if( strcmp(copy_type,"memcpy拷贝") ){
         printf("memcpy拷贝 starting\n");
         memcpy(&tree_cut_words_data,parent_cut_words_data,sizeof(tree_cut_words_data));
