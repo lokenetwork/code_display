@@ -7,50 +7,46 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-const int max_threads_number = 100;
-int current_threads_number = 0;
-bool is_end = false;
+int my_count = 0;
 
-void thread(int num)
-{
-    current_threads_number++;
-    if( current_threads_number > max_threads_number ){
-        is_end = true;
+void thread() {
+    for (int i = 0; i < 100; i++) {
+        //我开了5个线程模拟并发写，怎么没有冲突，每次都是500的结果
+        my_count++;
     }
-    int i= 1;
-    for(i=0;i<1;i++){
-        printf("This is a pthread %d.\n",sizeof(int));
-    }
-    pthread_t thread_id_1;
-    int ret=pthread_create(&thread_id_1,NULL,(void *) thread,2);
-    if( ret != 0 ){
-        printf("pthread_create error.\n");
-    }
-
 }
 
 
-
-int main(void)
-{
-    pthread_t thread_id_1;
-    int ret=pthread_create(&thread_id_1,NULL,(void *) thread,1);
-    if( ret != 0 ){
+int main(void) {
+    int ret;
+    pthread_t thread_id_1, thread_id_2, thread_id_3,thread_id_4,thread_id_5;
+    ret = pthread_create(&thread_id_1, NULL, (void *) thread, NULL);
+    if (ret != 0) {
         printf("pthread_create error.\n");
     }
-    /*
-     * 如何不用pthread_join来通信，因为我子进程可能会递归多N多子进程，直接一个pthread_join不行。好像管道可以，
-     * 我就想，子进程通知main，不管哪个子进程通知都行。有什么方法？
-     */
-    //pthread_join(thread_id_1,NULL);
-
-    //可不可以一直循环读取一个值？
-    for (;;) {
-        if( is_end == true ){
-            break;
-        }
+    ret = pthread_create(&thread_id_2, NULL, (void *) thread, NULL);
+    if (ret != 0) {
+        printf("pthread_create error.\n");
     }
+    ret = pthread_create(&thread_id_3, NULL, (void *) thread, NULL);
+    if (ret != 0) {
+        printf("pthread_create error.\n");
+    }
+    ret = pthread_create(&thread_id_4, NULL, (void *) thread, NULL);
+    if (ret != 0) {
+        printf("pthread_create error.\n");
+    }
+    ret = pthread_create(&thread_id_5, NULL, (void *) thread, NULL);
+    if (ret != 0) {
+        printf("pthread_create error.\n");
+    }
+    pthread_join(thread_id_1,NULL);
+    pthread_join(thread_id_2,NULL);
+    pthread_join(thread_id_3,NULL);
+    pthread_join(thread_id_4,NULL);
+    pthread_join(thread_id_5,NULL);
 
+    printf("my account is %d\n", my_count);
     printf("This is the main end.\n");
     return (0);
 }
