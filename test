@@ -1,0 +1,3 @@
+ @nahai_c. 我觉得你的finish number最好跟下面队列的EnQueue操作保持一致。你现在的写法有可能让finish number提前增加多次，而EnQueue不一定能保证执行相应的次数。
+【码奴】武汉-c-rainbow 2/05/2016 6:34:47 PM
+例如，finish number加了5次，EnQueue只执行了一次，然后就唤醒了那个信号量
